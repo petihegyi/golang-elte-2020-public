@@ -22,14 +22,14 @@ func main() {
 			errors <-err
 		}(path)
 	}
-	for range files {
+	for _,path:=range files {
 		hash:= <-hashed
 		err:=<-errors
 		if(err != nil){
 			fmt.Printf("ERROR %s", err)
 			continue
 		}
-		fmt.Printf("%x\t%s\n", hash,)
+		fmt.Printf("%x\t%s\n", hash,path)
 	}
 	// END
 }
