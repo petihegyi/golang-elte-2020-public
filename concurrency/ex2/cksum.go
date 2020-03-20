@@ -12,13 +12,24 @@ import (
 
 func main() {
 	// TODO: parallelize the checksum calculation
-	for _, path := range Files() {
-		hash, err := Hash(path)
-		if err != nil {
-			fmt.Printf("ERROR: %s", err)
+	files := Files()
+	hashed := make(chan []byte)
+	errors := make(chan error)
+	for _, path := range files {
+		go func(path string){
+			hash, err := Hash(path)
+			hashed <-hash
+			errors <-err
+		}(path)
+	}
+	for range files {
+		hash:= <-hashed
+		err:=<-errors
+		if(err != nil){
+			fmt.Printf("ERROR %s", err)
 			continue
 		}
-		fmt.Printf("%x\t%s\n", hash, path)
+		fmt.Printf("%x\t%s\n", hash,)
 	}
 	// END
 }
