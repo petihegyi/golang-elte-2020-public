@@ -10,26 +10,29 @@ import (
 	"path/filepath"
 )
 
+type result struct {
+	hash []byte
+	err error
+}
+
 func main() {
 	// TODO: parallelize the checksum calculation
 	files := Files()
-	hashed := make(chan []byte)
-	errors := make(chan error)
+	hashed := make(chan result)
 	for _, path := range files {
 		go func(path string){
 			hash, err := Hash(path)
-			hashed <-hash
-			errors <-err
+			res := result{hash, err}
+			hashed <-res
 		}(path)
 	}
-	for _,path:=range files {
-		hash:= <-hashed
-		err:=<-errors
-		if(err != nil){
-			fmt.Printf("ERROR %s", err)
+	for _, path := range files {
+		result := <-hashed
+		if(result.err != nil){
+			fmt.Printf("ERROR %s", result.err)
 			continue
 		}
-		fmt.Printf("%x\t%s\n", hash,path)
+		fmt.Printf("%x\t%s\n", result.hash,path)
 	}
 	// END
 }
