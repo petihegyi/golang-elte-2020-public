@@ -13,6 +13,7 @@ import (
 type result struct {
 	hash []byte
 	err error
+	path string
 }
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	for _, path := range files {
 		go func(path string){
 			hash, err := Hash(path)
-			res := result{hash, err}
+			res := result{hash, err, path}
 			hashed <-res
 		}(path)
 	}
@@ -32,7 +33,7 @@ func main() {
 			fmt.Printf("ERROR %s", result.err)
 			continue
 		}
-		fmt.Printf("%x\t%s\n", result.hash,path)
+		fmt.Printf("%x\t%s\n", result.hash,result.path)
 	}
 	// END
 }
