@@ -80,10 +80,10 @@ func HashAll() FileSet {
 	var wg sync.WaitGroup
 	mu := sync.Mutex{}
 	for _, path := range Files() {
-
+		wg.Add(1)
 		go func(path string) {
 			mu.Lock()
-			wg.Add(1)
+			
 			defer mu.Unlock()
 			defer wg.Done()
 			results[path] = Hash(path)
